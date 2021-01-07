@@ -1,20 +1,4 @@
 ---
-  #1.Ставим Java на все хосты.
-  - name: Install Java
-    hosts: all
-    pre_tasks:
-      #Скрипт взят отсюда
-      #https://github.com/gdraheim/docker-systemctl-replacement/blob/master/files/docker/systemctl3.py
-      #  - name: Install Systemd script 
-      #   - copy: src="files/docker/systemctl.py" dest="/usr/bin/systemctl"
-      #      - package: name="python"
-      #      - file: name="/run/systemd/system/" state="directory"
-      #      - service: name="dbus.service" state="stopped"
-    tasks:  
-      - name: "Include java-role"
-        include_role:
-          name: "java-role"
-
   #   #0. Копируем скрипт заменяющщий systemd
   # - name: Emulate Systemd
   #   hosts: elasticsearch
@@ -39,6 +23,23 @@
   #        when: "ansible_connection == 'docker'"
          
        #- service: name="dbus.service" state="stopped"
+
+  #1.Ставим Java на все хосты.
+  - name: Install Java
+    hosts: all
+    pre_tasks:
+      #Скрипт взят отсюда
+      #https://github.com/gdraheim/docker-systemctl-replacement/blob/master/files/docker/systemctl3.py
+      #  - name: Install Systemd script 
+      #   - copy: src="files/docker/systemctl.py" dest="/usr/bin/systemctl"
+      #      - package: name="python"
+      #      - file: name="/run/systemd/system/" state="directory"
+      #      - service: name="dbus.service" state="stopped"
+    tasks:  
+      - name: "Include java-role"
+        include_role:
+          name: "java-role"
+
 
   #2.Следующий Play установки Elasticsearch
   - name: Install Elasticsearch
