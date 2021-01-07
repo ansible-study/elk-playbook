@@ -1,0 +1,89 @@
+---
+  #1.Ставим Java на все хосты.
+  - name: Install Java
+    hosts: all
+    pre_tasks:
+      #Скрипт взят отсюда
+      #https://github.com/gdraheim/docker-systemctl-replacement/blob/master/files/docker/systemctl3.py
+      #  - name: Install Systemd script 
+      #   - copy: src="files/docker/systemctl.py" dest="/usr/bin/systemctl"
+      #      - package: name="python"
+      #      - file: name="/run/systemd/system/" state="directory"
+      #      - service: name="dbus.service" state="stopped"
+    tasks:  
+      - name: "Include java-role"
+        include_role:
+          name: "java-role"
+
+  #   #0. Копируем скрипт заменяющщий systemd
+  # - name: Emulate Systemd
+  #   hosts: elasticsearch
+  #   tasks:  
+  #     #Скрипт взят отсюда
+  #     #https://github.com/gdraheim/docker-systemctl-replacement/blob/master/files/docker/systemctl3.py
+  #      - name: update systemd
+  #        package: name="systemd" state="latest"
+  #        when: "ansible_connection == 'docker'" 
+  #      - name: Copy Systemd script 
+  #        copy: 
+  #         src: "files/systemctl3.py"
+  #         dest: "/usr/bin/systemctl"
+  #        when: "ansible_connection == 'docker'" 
+  #      - name: Create directory for Systemd
+  #        file: 
+  #         name: "/run/systemd/system/"
+  #         state: "directory"
+  #        when: "ansible_connection == 'docker'"
+  #      - name: install python for systemctl.py
+  #        package: name="python3"
+  #        when: "ansible_connection == 'docker'"
+         
+       #- service: name="dbus.service" state="stopped"
+
+  #2.Следующий Play установки Elasticsearch
+  - name: Install Elasticsearch
+    hosts: elasticsearch
+    pre_tasks:
+      - name: Gathering es_host_ip
+        debug: 
+          msg: "!!!es_host_ip: {{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"  
+      - name: Set variable es_host_ip #Если переменная не задана находим и устанавливаем
+        set_fact: 
+          es_host_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+        when: es_host_ip is undefined
+    tasks:
+      - name: "Include elastic-role"
+        include_role:
+          name: "elastic-role"
+      # - name: add file
+      #   include: file.yml
+
+
+  #3.Следующий Play установки Kibana
+  - name: Install Kibana
+    hosts: kibana
+    pre_tasks:
+      - name: Gathering kibana_host_ip
+        debug:
+          msg: "!!!kibana_host_ip: {{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"      
+    tasks:
+      - name: "Include kibana-role"
+        include_role:
+          name: "kibana-role"
+        
+        
+  #4.Play установки Logstash
+  - name: Install Logstash
+    hosts: logstash
+    pre_tasks:
+      - name: Gathering logstash_host_ip
+        debug:
+          msg: "!!!logstash_host_ip: {{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+    tasks:
+      - name: "Include logstash-role"
+        include_role:    
+          name: logstash-role
+
+
+      
+
